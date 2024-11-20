@@ -1,5 +1,6 @@
 const mqtt = require('mqtt');
 const { Client } = require('pg');
+require('dotenv').config();
 
 // Configuração do broker MQTT
 const broker = 'mqtt://broker.hivemq.com';
@@ -8,11 +9,7 @@ const topicPublish = 'test/response';
 
 // Conexão com o banco de dados PostgreSQL
 const dbClient = new Client({
-  host: 'localhost',
-  database: 'meu_banco',
-  user: 'postgres',
-  password: 'senha_segura',
-  port: 5432
+  connectionString: process.env.DATABASE_URL
 });
 
 dbClient.connect()
