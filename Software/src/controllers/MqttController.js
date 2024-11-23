@@ -1,5 +1,7 @@
 const mqtt = require('mqtt');
 const UserController = require('./UserController.js');
+const AcessosController = require('./AcessosController');
+const User = require('../entities/User.js');
 
 /**
  * Controlador MQTT.
@@ -62,9 +64,29 @@ class MqttController {
         if (!this.mqttClient) {
             throw new Error("Cliente MQTT não inicializado.");
         }
+        this.processRequest(message, topicPublish);
+    }
 
-        // Valida o usuário no UserController
-        UserController.validateUser(message, this.mqttClient, topicPublish);
+    processRequest = async (message, topicPublish) => {
+        try {
+            const userToWantAcess = await UserController.validateUser(message, this.mqttClient, topicPublish);
+
+            if (userToWantAcess) {
+                console.log('Usuário já existe no banco de dados. Registrando acesso...');
+
+                // Chama o método em AcessosController para registrar o acesso
+                await AcessosController.registerAcess(userToWantAcess.id);
+
+                // Publica uma mensagem no tópico indicando sucesso
+                this.mqttClient.publish(topicPublish, `Acesso registrado para o usuário de ID: '${userToWantAcess.id}'.`);
+            } else {
+                console.log('Usuario invalido.');
+                this.mqttClient.publish(topicPublish, 'Usuário inválido.');
+            }
+        } catch (error) {
+            console.error('Erro ao processar solicitação:', error);
+            this.mqttClient.publish(topicPublish, 'Erro ao processar a solicitação.');
+        }
     }
 }
 

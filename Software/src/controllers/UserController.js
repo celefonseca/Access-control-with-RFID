@@ -1,18 +1,13 @@
-const UserRepository = require('../repository/UserRepository.js');
+const UserRepository = require('../repositories/UserRepository.js');
 
 
-const validateUser = async (id, mqttClient, topicPublish) => {
+const validateUser = async (userId) => {
     try {
-      const existingUser = await UserRepository.getUserById(id);
-
-      if (existingUser) {
-        console.log('Usuario já existe no banco de dados. Enviando resposta...');
-        mqttClient.publish(topicPublish, `Usuario de Id:'${id}' já existe no banco.`);
-      } else {
-        console.log('Usuario invalido.');
-      }
+      const user = await getUserById(userId);
+      return user;
     } catch (err) {
       console.error('Erro ao validar usuario:', err);
+      throw err;
     }
   }
 

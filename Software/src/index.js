@@ -14,6 +14,6 @@ mqttController.mqttClient?.on('connect', () => {
 });
 
 // Definindo o comportamento ao receber mensagens
-mqttController.mqttClient?.on('message', (topic, message) => {
-  mqttController.handleIncomingMessage(topic, message.toString(), topicPublish);
+mqttController.mqttClient?.on('message', async (topic, message) => {
+  await mqttController.handleIncomingMessage(topic, message.toString(), topicPublish);
 });
