@@ -3,7 +3,7 @@ const { dbClient } = require('../config/dbConfig');
 class AcessosRepository {
   static async save(acesso) {
     const query = `
-      INSERT INTO acessos (usuario_id, data_hora)
+      INSERT INTO acessos (usuario_id, evento_timestamp)
       VALUES ($1, $2)
       RETURNING *;
     `;

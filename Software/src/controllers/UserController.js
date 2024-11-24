@@ -1,4 +1,4 @@
-const UserRepository = require('../repositories/UserRepository.js');
+const {getUserById} = require('../repositories/UserRepository.js');
 
 
 const validateUser = async (userId) => {

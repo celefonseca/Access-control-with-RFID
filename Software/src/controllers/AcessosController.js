@@ -5,7 +5,7 @@ class AcessosController {
   static async registerAcess(usuarioId) {
     try {
       // Cria uma nova instância da entidade Acessos
-      const novoAcesso = new Acessos(usuarioId, new Date());
+      const novoAcesso = new Acessos(usuarioId, new Date().toISOString());
 
       // Salva o acesso no banco de dados
       const acessoSalvo = await AcessosRepository.save(novoAcesso);

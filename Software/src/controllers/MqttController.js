@@ -1,7 +1,6 @@
 const mqtt = require('mqtt');
 const UserController = require('./UserController.js');
 const AcessosController = require('./AcessosController');
-const User = require('../entities/User.js');
 
 /**
  * Controlador MQTT.
@@ -9,6 +8,7 @@ const User = require('../entities/User.js');
 class MqttController {
     constructor() {
         this.mqttClient = null;
+        this.clientId = `mqtt_${Math.random().toString(16).slice(2)}`;
     }
     /**
      * Inicializa o cliente MQTT e conecta ao broker fornecido.
@@ -42,10 +42,6 @@ class MqttController {
                 console.error("Erro ao subscrever ao tópico:", err);
             }
         });
-
-        this.mqttClient.on("message", (topic, message) => {
-            this.handleIncomingMessage(topic, message.toString(), topicSubscribe);
-        });
     }
 
     /**
@@ -56,36 +52,51 @@ class MqttController {
      */
     handleIncomingMessage = (
         topic,
-        message,
+        messageRaw,
         topicPublish
     ) => {
-        console.log(`Mensagem recebida no tópico ${topic}: ${message}`);
 
         if (!this.mqttClient) {
             throw new Error("Cliente MQTT não inicializado.");
         }
+        
+        console.log(`Mensagem recebida no tópico ${topic}: ${messageRaw}`);
+
+        const parsedMessage = JSON.parse(messageRaw.toString());
+            let message = messageRaw;
+
+            if (parsedMessage.senderId){
+                if(parsedMessage.senderId === this.clientId) {
+                    return;
+                }
+                message = parsedMessage?.data
+            }
+        
         this.processRequest(message, topicPublish);
     }
 
     processRequest = async (message, topicPublish) => {
         try {
-            const userToWantAcess = await UserController.validateUser(message, this.mqttClient, topicPublish);
+            const userToWantAcess = await UserController.validateUser(message);
 
             if (userToWantAcess) {
                 console.log('Usuário já existe no banco de dados. Registrando acesso...');
 
-                // Chama o método em AcessosController para registrar o acesso
                 await AcessosController.registerAcess(userToWantAcess.id);
 
-                // Publica uma mensagem no tópico indicando sucesso
-                this.mqttClient.publish(topicPublish, `Acesso registrado para o usuário de ID: '${userToWantAcess.id}'.`);
+                const payload = JSON.stringify({
+                    senderId: this.clientId,
+                    data: `Acesso registrado para o usuário de ID: '${userToWantAcess.id}'.`
+                });
+
+                this.mqttClient.publish(topicPublish, payload);
             } else {
                 console.log('Usuario invalido.');
-                this.mqttClient.publish(topicPublish, 'Usuário inválido.');
+                //this.mqttClient.publish(topicPublish, 'Usuário inválido.');
             }
         } catch (error) {
             console.error('Erro ao processar solicitação:', error);
-            this.mqttClient.publish(topicPublish, 'Erro ao processar a solicitação.');
+            //this.mqttClient.publish(topicPublish, 'Erro ao processar a solicitação.');
         }
     }
 }

@@ -1,20 +1,10 @@
-# Usar uma imagem base oficial do Node.js
-FROM node:18-alpine
-
-# Definir o diretório de trabalho no container
-WORKDIR /app
-
-# Copiar arquivos do projeto para o container
-COPY package*.json ./
-
-# Instalar as dependências
-RUN npm install
-
-# Copiar o restante do código
+FROM node:lts-alpine
+ENV NODE_ENV=production
+WORKDIR /usr/src/app
+COPY ["package.json", "package-lock.json*", "npm-shrinkwrap.json*", "./"]
+RUN npm install --production --silent && mv node_modules ../
 COPY . .
-
-# Expor a porta usada pela aplicação
-EXPOSE 3000
-
-# Comando para rodar a aplicação
-CMD ["node", "src/index.js"]
+EXPOSE 9229
+RUN chown -R node /usr/src/app
+USER node
+CMD ["npm", "start"]

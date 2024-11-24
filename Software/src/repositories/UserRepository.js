@@ -1,4 +1,5 @@
 const { dbClient }= require('../config/dbConfig');
+const User = require('../entities/User.js');
 
 const getUserById = async (id) => {
   const result = await dbClient.query('SELECT id, nome FROM usuarios WHERE id = $1', [id]);
