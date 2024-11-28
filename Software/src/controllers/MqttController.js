@@ -59,19 +59,26 @@ class MqttController {
         if (!this.mqttClient) {
             throw new Error("Cliente MQTT não inicializado.");
         }
-        
+
         console.log(`Mensagem recebida no tópico ${topic}: ${messageRaw}`);
 
-        const parsedMessage = JSON.parse(messageRaw.toString());
-            let message = messageRaw;
+        let message = messageRaw;
 
-            if (parsedMessage.senderId){
-                if(parsedMessage.senderId === this.clientId) {
+        try {
+            const parsedMessage = JSON.parse(messageRaw.toString());
+
+            if (parsedMessage.senderId) {
+                // Ignorar mensagens enviadas por este cliente
+                if (parsedMessage.senderId === this.clientId) {
                     return;
                 }
-                message = parsedMessage?.data
+                // Substituir a mensagem com o campo `data` do JSON
+                message = parsedMessage?.data;
             }
-        
+        } catch (error) {
+            console.warn('Mensagem não é JSON válida, utilizando mensagem crua:', error);
+        }
+
         this.processRequest(message, topicPublish);
     }
 
@@ -88,7 +95,7 @@ class MqttController {
 
                 const payload = JSON.stringify({
                     senderId: this.clientId,
-                    data: '32'
+                    data: '1'
                 });
 
                 this.mqttClient.publish(topicPublish, payload);
@@ -97,7 +104,7 @@ class MqttController {
 
                 const payload = JSON.stringify({
                     senderId: this.clientId,
-                    data: '31'
+                    data: '0'
                 });
                 this.mqttClient.publish(topicPublish, payload);
             }

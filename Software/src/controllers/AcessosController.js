@@ -16,6 +16,16 @@ class AcessosController {
       throw error;
     }
   }
+
+  static async listAccess() {
+    try {
+    const acessosComUsuarios = await AcessosRepository.listAccess();
+    return acessosComUsuarios
+  } catch (error) {
+    console.error('Erro ao listar acessos:', error);
+    throw error;
+  }
+  }
 }
 
 module.exports = AcessosController;

@@ -8,7 +8,7 @@ services:
       - "9229:9229"  #for debug
     depends_on:
       - db
-      #- mosquitto
+      - mosquitto
     environment:
       - DATABASE_URL=${DATABASE_URL}
       - MQTT_BROKER_URL=mqtt://mosquitto:1883
@@ -31,16 +31,16 @@ services:
     volumes:
       - postgres_data:/var/lib/postgresql/data
       - ./src/database/init.sql:/docker-entrypoint-initdb.d/init.sql
-  #mosquitto:
-  #  image: eclipse-mosquitto:2.0
-  #  ports:
-  #    - "1883:1883" # Porta para conexões MQTT
-  #    - "9001:9001" # Porta para WebSocket (opcional)
-  #  volumes:
-  #    - ./mosquitto/config:/mosquitto/config
-  #    - ./mosquitto/data:/mosquitto/data
-  #    - ./mosquitto/log:/mosquitto/log
+  mosquitto:
+   image: eclipse-mosquitto:2.0
+   ports:
+     - "1883:1883" # Porta para conexões MQTT
+     - "9001:9001" # Porta para WebSocket (opcional)
+   volumes:
+     - ./mosquitto/config:/mosquitto/config
+     - ./mosquitto/data:/mosquitto/data
+     - ./mosquitto/log:/mosquitto/log
 volumes:
   postgres_data:
- # mosquitto_data:
- # mosquitto_log:
+  mosquitto_data:
+  mosquitto_log:

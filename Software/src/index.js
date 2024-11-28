@@ -2,6 +2,7 @@ const express = require('express');
 const bodyParser = require('body-parser');
 const MqttController = require('./controllers/MqttController');
 const UserController = require('./controllers/UserController.js');
+const AcessosController = require('./controllers/AcessosController.js');
 const path = require('path');
 const  {broker, topicSubscribe, topicPublish } = require('./config/mqttConfig');
 
@@ -44,6 +45,17 @@ app.post('/register', async (req, res) => {
     res.status(201).json({ message: 'Usuário cadastrado com sucesso!', data: { id, name } });
   } catch (error) {
     console.error('Erro ao cadastrar usuário:', error);
+    res.status(500).json({ error: 'Erro interno do servidor.' });
+  }
+});
+
+app.get('/access', async (req, res) => {
+  try {
+    const acessosComUsuarios = await AcessosController.listAccess();
+
+    res.status(200).json(acessosComUsuarios);
+  } catch (error) {
+    console.error('Erro ao listar acessos:', error);
     res.status(500).json({ error: 'Erro interno do servidor.' });
   }
 });
