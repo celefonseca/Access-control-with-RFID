@@ -10,4 +10,9 @@ const getUserById = async (id) => {
   }
   };
 
-  module.exports = { getUserById };
+  const saveUser = async ({ id, name }) => {
+    const result = await dbClient.query('INSERT INTO usuarios (id, nome) VALUES ($1, $2) RETURNING *', [id, name]);
+    return result.rows[0];
+  };
+
+  module.exports = { getUserById, saveUser};

@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Cadastro de Usuário</title>
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@4.3.1/dist/css/bootstrap.min.css"
+    integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" crossorigin="anonymous">
+  <link rel="stylesheet" href="./styles.css">
+</head>
+
+<body>
+  <div class="container">
+    <img
+      src="https://funkoeurope.com/cdn/shop/files/77952_SWep1_RetroSeries_YoungObiWan_POP_GLAM-3-WEB.png?v=1712321214" />
+    <h1>Cadastro de Usuário</h1>
+    <form id="userForm">
+      <label for="id">ID:</label>
+      <input type="text" id="id" name="id" required class="form-control" />
+      <br><br>
+      <label for="name">Nome:</label>
+      <input type="text" id="name" name="name" required class="form-control" />
+      <br><br>
+      <div class="button-container">
+        <button type="submit" class="btn btn-primary">Cadastrar</button>
+      </div>
+
+    </form>
+    <div id="responseMessage" style="margin-top: 20px;"></div>
+  </div>
+
+  <script>
+    const form = document.getElementById('userForm');
+    const responseMessage = document.getElementById('responseMessage');
+
+    form.addEventListener('submit', async (event) => {
+      event.preventDefault();
+
+      const id = document.getElementById('id').value;
+      const name = document.getElementById('name').value;
+
+      try {
+        const response = await fetch('http://localhost:3000/register', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({ id, name }),
+        });
+
+        const result = await response.json();
+
+        if (response.ok) {
+          responseMessage.textContent = `Sucesso: ${result.message}`;
+          responseMessage.style.color = 'green';
+        } else {
+          responseMessage.textContent = `Erro: ${result.error}`;
+          responseMessage.style.color = 'red';
+        }
+      } catch (error) {
+        responseMessage.textContent = `Erro de conexão: ${error.message}`;
+        responseMessage.style.color = 'red';
+      }
+
+      // Limpa os campos do formulário
+      form.reset();
+    });
+  </script>
+</body>
+
+</html>

@@ -84,19 +84,25 @@ class MqttController {
 
                 await AcessosController.registerAcess(userToWantAcess.id);
 
+                console.log(`Acesso registrado para o usuário de ID: '${userToWantAcess.id}`);
+
                 const payload = JSON.stringify({
                     senderId: this.clientId,
-                    data: `Acesso registrado para o usuário de ID: '${userToWantAcess.id}'.`
+                    data: '32'
                 });
 
                 this.mqttClient.publish(topicPublish, payload);
             } else {
                 console.log('Usuario invalido.');
-                //this.mqttClient.publish(topicPublish, 'Usuário inválido.');
+
+                const payload = JSON.stringify({
+                    senderId: this.clientId,
+                    data: '31'
+                });
+                this.mqttClient.publish(topicPublish, payload);
             }
         } catch (error) {
             console.error('Erro ao processar solicitação:', error);
-            //this.mqttClient.publish(topicPublish, 'Erro ao processar a solicitação.');
         }
     }
 }
